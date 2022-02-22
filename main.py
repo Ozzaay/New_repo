@@ -1,59 +1,64 @@
 import resources
-from resources import Character, Goblin
-from random import randint, shuffle
+from resources import Character, Goblin, save_character, load_characters
+from random import randint, shuffle, choice
 
-
-
-
-def fight(players: list, enemies: list):
-    participants = players+enemies
+def fight(players : list, enemies : list):
+    participants = players + enemies # skapa initiativordning 
     shuffle(participants)
+    
     for char in participants:
         target = ""
-        # Is the character a player or an enemy
+        # är karaktären en spelare eller en goblin?
         if char in players:
             target = choice(enemies)
         else:
             target = choice(players)
+            
         target.take_damage(char.get_attack())
-        if target.get_hp == 0:
-            print(f"{target.get_name()} has died.")
+        
+        if target.get_health() == 0:
+            print(f"{target.get_name()} has died!")
             if type(target) == Goblin:
                 enemies.remove(target)
             else:
                 players.remove(target)
             participants.remove(target)
         else:
-            print(f"{target.get_name()} has {target.get_health} hp left.")
-        if len(players) == 0 or len(enemies) == 0:
-            break
-
-
-if __name__ == "__main__":
-    nemy = Character("Nemy", 20, 5, 2)
-    goblin_one = Goblin(10, 3, 1)
-    players.append(nemy)
-    print(nemy)
-    print()
-    print(goblin_one)
-    
-    fight_round = 1
-    print("=========FIGHT=========")
-    while nemy.get_health() != 0 and goblin_one.get_health != 0:
-        print(f"Round {fight_round}")
-        nemy_attack = nemy.get_attack()*randint(1,3)
-        goblin_one.take_damage(nemy_attack)
-        if(goblin_one.get_health() == 0):
-            print("Goblin has died.")
-            break
-        else:
-            print(f"Goblin has {goblin_one.get_health()} hp left.")
-            goblin_attack = goblin_one.damage()*randint(1,4)
-            nemy.take_damage(goblin_attack)
-            print(f"Nemy has {nemy.get_health()} hp left.")
-            if(nemy.get_health() == 0): print("Nemy has died.")
-        fight_round += 1
-    
-    if(nemy.get_health() == 0): print("The Goblin won!")
-    else: print("Nemy has won!")
+            print(f"{target.get_name()} has {target.get_health()} hp remaining.")
         
+        if len(enemies) == 0 or len(players) == 0:
+            break
+            
+    
+if __name__ == "__main__":
+    enemies = []
+    players = load_characters()
+    
+  #  emy = Character("Emy", 20, 5, 2)
+  #  nick = Character("Nick", 15, 2, 1)
+  #  players.append(emy)
+  #  players.append(nick)
+    
+    enemies.append(Goblin(10, 3, 2, 1))
+    enemies.append(Goblin(15, 2, 1, 2))
+    enemies.append(Goblin(12, 3, 1, 3))
+    
+    round = 1
+    while len(enemies) != 0 and len(players) != 0:
+        print(f"ROUND {round}, FIGHT!")
+        fight(players, enemies)
+        print()
+        round +=1
+    
+    if len(enemies) == 0:
+        print("The players won!")
+        print("Would you like to save the remaining characters?")
+        save_char = input('(y/n): ')
+        if save_char == 'y':
+            for player in players:
+                save_character(player)
+        else:
+            print("No Progress was saved")
+    elif len(players) == 0:
+        print("The Goblins won!")
+    
